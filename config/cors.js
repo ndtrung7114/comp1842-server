@@ -1,5 +1,4 @@
-const allowedOrigins = require('./allowed_origins')
-
+const allowedOrigins = require("./allowed_origins");
 
 // const corsOptions = {
 //   origin: (origin, callback) => {
@@ -11,11 +10,10 @@ const allowedOrigins = require('./allowed_origins')
 //   }
 // }
 
+const corsOptions = {
+  origin: "https://greenwichsocial.vercel.app/",
+  credentials: true, //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+};
 
-const corsOptions ={
-    origin:'http://localhost:5173', 
-    credentials:true,            //access-control-allow-credentials:true
-    optionSuccessStatus:200
-}
-
-module.exports = corsOptions
+module.exports = corsOptions;

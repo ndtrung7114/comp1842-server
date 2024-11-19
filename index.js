@@ -20,7 +20,7 @@ const server = http.createServer(app)
 const io = socketIo(server, {
   pingTimeout: 60000,
   cors: {
-    origin: corsOptions.origin, // This will be 'http://localhost:5173'
+    origin: corsOptions.origin, 
     credentials: corsOptions.credentials, // This will be true
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
   }
