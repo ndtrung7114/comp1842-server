@@ -21,7 +21,7 @@ const io = socketIo(server, {
   pingTimeout: 60000,
   cors: {
     origin: corsOptions.origin, 
-    credentials: corsOptions.credentials, // This will be true
+    credentials: corsOptions.credentials, 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
   }
 })
