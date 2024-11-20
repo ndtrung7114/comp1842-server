@@ -2,6 +2,8 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 const Comment = require("../models/Comment");
 const Notification = require("../models/Notification");
+const cloudinary = require('cloudinary').v2;
+const crypto = require('crypto');
 const path = require("path");
 const fs = require("fs");
 //function to create a post
@@ -15,25 +17,10 @@ const createPost = async (req, res) => {
     //get the userID from authentiend user
     const userId = req.user._id;
     // Check and filter existing images
-    const imageUrls = req.files
-      ? await Promise.all(req.files.map(async (file) => {
-          const existingFilePath = path.join(
-            __dirname, 
-            "..", 
-            "uploads", 
-            file.filename
-          );
-          
-          // If file doesn't exist, it will be saved by multer
-          // If file exists, use existing path
-          try {
-            await fs.promises.access(existingFilePath, fs.constants.F_OK);
-            return `/uploads/${file.filename}`;
-          } catch (err) {
-            // File doesn't exist, multer will save it
-            return `/uploads/${file.filename}`;
-          }
-        }))
+    
+
+      const imageUrls = req.files
+      ? req.files.map(file => file.path) // Cloudinary provides full URL in file.path
       : [];
 
     const newPost = await Post.create({
@@ -132,6 +119,12 @@ const getPostById = async (req, res) => {
   }
 };
 
+// Utility function to extract public ID from Cloudinary URL
+const extractPublicIdFromUrl = (url) => {
+  const matches = url.match(/\/v\d+\/(.+)\.\w+$/);
+  return matches ? matches[1] : null;
+};
+
 //Update a post
 
 const updatePost = async (req, res) => {
@@ -140,14 +133,12 @@ const updatePost = async (req, res) => {
 
   const existingImageUrls = JSON.parse(req.body.imageUrls || "[]");
 
-  // Get new image files from multer
+  // For Cloudinary, use file paths directly
   const newImageUrls = req.files
-    ? req.files.map((file) => `/uploads/${file.filename}`)
+    ? req.files.map(file => file.path)
     : [];
 
-  // Combine existing and new image URLs
-  const combinedImageUrls = [...existingImageUrls, ...newImageUrls];
-
+ 
   try {
     const post = await Post.findById(id);
     if (!post) {
@@ -161,31 +152,18 @@ const updatePost = async (req, res) => {
         .json({ message: "You are not authorized to update this post" });
     }
 
-    // Remove deleted images from storage
+    // Remove deleted images from storage cloudinary
     const removedImages = post.imageUrls.filter(
       (url) => !existingImageUrls.includes(url)
     );
     for (const imageUrl of removedImages) {
-      try {
-        // Remove the file from your storage
-        const filePath = path.join(
-          __dirname,
-          "..",
-          "uploads",
-          imageUrl.replace("/uploads/", "")
-        );
-
-        // Check if the file exists before attempting to delete it
-        await fs.promises.access(filePath, fs.constants.F_OK);
-
-        // File exists, now remove it
-        await fs.promises.unlink(filePath);
-        console.log(`Deleted image: ${filePath}`);
-      } catch (err) {
-        console.error("Error deleting image:", err);
-        // Continue even if deletion fails
+      const publicId = extractPublicIdFromUrl(imageUrl);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
       }
     }
+
+    const combinedImageUrls = [...existingImageUrls, ...newImageUrls];
 
     // Update the post
     post.title = title;
@@ -220,27 +198,9 @@ const deletePost = async (req, res) => {
 
     // Delete images from upload folder
     for (const imageUrl of post.imageUrls) {
-      try {
-        // Remove the file from storage
-        const filePath = path.join(
-          __dirname,
-          "..",
-          "uploads",
-          imageUrl.replace("/uploads/", "")
-        );
-    
-        // Check if the file exists before attempting to delete it
-        await fs.promises.access(filePath, fs.constants.F_OK);
-    
-        // File exists, now remove it
-        await fs.promises.unlink(filePath);
-        console.log(`Deleted image: ${filePath}`);
-      } catch (err) {
-        // Only log errors that are NOT "file not found"
-        if (err.code !== 'ENOENT') {
-          console.error("Error deleting image:", err);
-        }
-        // Silently continue if file is already deleted
+      const publicId = extractPublicIdFromUrl(imageUrl);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
       }
     }
 

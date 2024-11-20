@@ -11,7 +11,7 @@ const allowedOrigins = require("./allowed_origins");
 // }
 
 const corsOptions = {
-  origin: "https://greenwichsocial.vercel.app",
+  origin: "https://greenwichsocial.onrender.com",
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };

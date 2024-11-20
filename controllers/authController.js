@@ -253,10 +253,7 @@ async function updateProfile(req, res) {
   
 
   // Handle avatar update
-  // Handle multiple image uploads, save paths in an array
-  const imageUrls = req.files
-  ? req.files.map((file) => `/uploads/${file.filename}`)
-  : [];
+ 
 
   try {
     // Only update fields that were sent in the request
@@ -266,9 +263,10 @@ async function updateProfile(req, res) {
     if (req.body.email !== undefined) user.email = req.body.email;
     if (req.body.facebook !== undefined) user.profile.facebook = req.body.facebook;
     
-    // Only update avatar if new images were uploaded
+    // Update avatar with Cloudinary URL
     if (req.files && req.files.length > 0) {
-      user.profile.avatar = `/uploads/${req.files[0].filename}`;
+      // Use the first uploaded file's Cloudinary path directly
+      user.profile.avatar = req.files[0].path;
     }
 
     await user.save();

@@ -7,7 +7,7 @@ exports.sendMessage = async (req, res, io) => {
   
 
   const imageUrls = req.files
-      ? req.files.map((file) => `/uploads/${file.filename}`)
+      ? req.files.map(file => file.path) // Cloudinary provides full URL in file.path
       : [];
 
   try {
