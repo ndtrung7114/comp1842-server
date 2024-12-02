@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 
 
 
-// register with role basedcz
+// register with role based
 async function register(req, res) {
   const {username, email, first_name, last_name, password, password_confirm} = req.body
 
@@ -64,29 +64,28 @@ async function register(req, res) {
 
 
 async function login(req, res){
+  //retrieve email and password from request body
   const {email, password } = req.body
-
+//check if email and password are provided
   if(!email || !password) return res.status(422).json({'message': 'Invalid fields'})
-  
+  // check if user exists
   const user = await User.findOne({email}).exec()
-
-  
-
+  // if user does not exist
   if(!user) return res.status(401).json({message: "Email is in incorrect"})
-
+// check if password is correct
   const match = await bcrypt.compare(password, user.password)
 
   if(!match) return res.status(401).json({message: "Email or password is incorrect"})
-
+    //check if user is banned
   if(user.isBan) return res.status(401).json({message: "User is banned"})
-
+//generate access token
   const accessToken = jwt.sign(
     {
       id: user.id
     },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: '1800s'
+      expiresIn: '1800s' // valid in 30 minutes
     }
   )
 
@@ -103,6 +102,7 @@ async function login(req, res){
   user.refresh_token = refreshToken
   await user.save()
 
+  // Set refresh token in cookie
   res.cookie('refresh_token', refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24*60*60*1000})
 
   //return the user and role document
@@ -130,27 +130,30 @@ async function logout(req, res){
 }
 
 async function refresh(req, res){
+  // Get refresh token from cookie
   const cookies = req.cookies
+  // Check if refresh token exists
   if(!cookies.refresh_token) return res.sendStatus(401)
-
+  // Get refresh token
   const refreshToken = cookies.refresh_token
-
+// Check if refresh token is valid
   const user = await User.findOne({refresh_token: refreshToken}).exec()
 
   if(!user) return res.sendStatus(403)
 
+    // Verify refresh token
   jwt.verify(
     refreshToken,
     process.env.REFRESH_TOKEN_SECRET,
     (err, decoded) => {
       if(err || user.id !== decoded.id) return res.sendStatus(403)
-
+        // Generate new access token
       const accessToken = jwt.sign(
         { id: decoded.id },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: '1800s' }
       )
-
+// Return new access token
       res.json({access_token: accessToken})
     }
   )

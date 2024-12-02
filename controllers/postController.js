@@ -17,12 +17,9 @@ const createPost = async (req, res) => {
     //get the userID from authentiend user
     const userId = req.user._id;
     // Check and filter existing images
-    
-
       const imageUrls = req.files
       ? req.files.map(file => file.path) // Cloudinary provides full URL in file.path
       : [];
-
     const newPost = await Post.create({
       title,
       body,

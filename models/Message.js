@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-
+// Define the message schema
 const MessageSchema = new Schema(
     {
       sender: { type: Schema.Types.ObjectId, ref: 'users', required: true },  // User who sends the message
@@ -12,6 +12,6 @@ const MessageSchema = new Schema(
       is_read: { type: Boolean, default: false }  // Whether the recipient has read the message
     }
   );
-  
+  // Export the model
   module.exports = mongoose.model('messages', MessageSchema);
   

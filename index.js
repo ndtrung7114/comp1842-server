@@ -1,7 +1,7 @@
 require('dotenv').config()
 const socketIo = require('socket.io')
 const http = require('http')
-const express = require('express')
+
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
@@ -12,7 +12,10 @@ const credentials = require('./middleware/credentials')
 const errorHandlerMiddleware = require('./middleware/error_handler')
 const authenticationMiddleware = require('./middleware/authentication')
 
+// Create Express server
+const express = require('express')
 const app = express()
+
 // Create HTTP server
 const server = http.createServer(app)
 

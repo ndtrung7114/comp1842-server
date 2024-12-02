@@ -1,17 +1,8 @@
 const allowedOrigins = require("./allowed_origins");
 
-// const corsOptions = {
-//   origin: (origin, callback) => {
-//     if(allowedOrigins.includes(origin) || !origin){
-//       callback(null, true)
-//     }else{
-//       callback(new Error('Not allowed by CORS'))
-//     }
-//   }
-// }
-
+// CORS options
 const corsOptions = {
-  origin: "https://greenwichsocial.vercel.app",
+  origin: "https://greenwichsocial.vercel.app", // only allow this domain to make requests
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };

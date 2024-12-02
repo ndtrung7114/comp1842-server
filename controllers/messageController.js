@@ -1,16 +1,16 @@
+// import the Message model
 const Message = require("../models/Message");
 
 // Send a new message
 exports.sendMessage = async (req, res, io) => {
   const { sender, recipient, content = '' } = req.body;
 
-  
-
   const imageUrls = req.files
       ? req.files.map(file => file.path) // Cloudinary provides full URL in file.path
       : [];
 
   try {
+    // Create a new message
     const message = new Message({
       sender,
       recipient,
