@@ -1,7 +1,6 @@
 require('dotenv').config()
 const socketIo = require('socket.io')
 const http = require('http')
-
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
@@ -40,11 +39,7 @@ io.on('connection', (socket) => {
   socket.on('register', (userId) => {
     console.log('User joined room:', userId);
     socket.join(userId); // User joins a room based on their ID
-
-
   });
-
-
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);

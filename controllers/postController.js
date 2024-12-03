@@ -143,7 +143,7 @@ const updatePost = async (req, res) => {
     }
 
     //check if the user is the author of the post
-    if (post.author.toString() !== req.user._id.toString()) {
+    if (post.author.toString() !== req.user._id.toString() && req.user.role != "admin") {
       return res
         .status(401)
         .json({ message: "You are not authorized to update this post" });

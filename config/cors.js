@@ -1,8 +1,8 @@
-const allowedOrigins = require("./allowed_origins");
+
 
 // CORS options
 const corsOptions = {
-  origin: "https://greenwichsocial.vercel.app", // only allow this domain to make requests
+  origin: "https://greenwichsocial.vercel.app", //client origin
   credentials: true, //access-control-allow-credentials:true
   optionSuccessStatus: 200,
 };
